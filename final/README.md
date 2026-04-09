@@ -1,3 +1,11 @@
+# App Purpose
+
+This app was made for practicing in a React framework.
+
+The game that it is based off of can be found here https://www.brainbashers.com/show3inarow.asp
+
+Please click the link in order to understand the game.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
