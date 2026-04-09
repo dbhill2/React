@@ -10,65 +10,65 @@ export default function BoardTimerBorder({ size, duration, active, ogTime, setSt
       if (frameRef.current) cancelAnimationFrame(frameRef.current); //cancels a potential tick if timer goes inactive
       return;
     }
+    const start = performance.now();
 
-      const start = performance.now();
+    const tick = (now) => {//timer countdown
+      const elapsed = now - start;
+      const pct = Math.max(1 - elapsed / duration, 0);
+      setProgress(pct);
 
-      const tick = (now) => {//timer countdown
-        const elapsed = now - start;
-        const pct = Math.max(1 - elapsed / duration, 0);
-        setProgress(pct);
-
-        if (pct > 0) {
-          frameRef.current = requestAnimationFrame(tick);//ticks timer down until it reaches 0
-        }
-      };
-
-      frameRef.current = requestAnimationFrame(tick);
-
-      return () => {
-        if (frameRef.current) cancelAnimationFrame(frameRef.current);
-      };
-    }, [active, duration]);
-
-    const strokeWidth = 8;
-    const perimeter = (size - strokeWidth) * 4;
-    const dashOffset = perimeter * (1 - progress);
-
-    const remaining = progress * (duration / 1000);
-    const warnedHalf = useRef(false);
-
-    useEffect(() => {
-      if (active) {
-        warnedHalf.current = false;
+      if (pct > 0) {
+        frameRef.current = requestAnimationFrame(tick);//ticks timer down until it reaches 0
       }
-    }, [active, duration]);
+    };
 
-    useEffect(() => {
-      if (!active) return;
+    frameRef.current = requestAnimationFrame(tick);//calls the function above
 
-      const remaining = progress * (duration / 1000);
+    return () => {
+      if (frameRef.current) cancelAnimationFrame(frameRef.current); //stops the clock when timer is stopped
+    };
+  }, [active, duration]);// uses these states to signal when to start
 
-      if (!warnedHalf.current && remaining <= ogTime * 0.5) {
-        warnedHalf.current = true;
-        setStatusMessage("You have used half your allotted time!!!");
-      }
+  //svg
+  const strokeWidth = 8; //border px subtracts from size
+  const perimeter = (size - strokeWidth) * 4; // total length of border
+  const dashOffset = perimeter * (1 - progress);// animation that makes the "dashed" border slide away. 1 = full border 0= no border
 
-      if(remaining <= 5){
-        setStatusMessage("5")
-      }
-      if(remaining <= 4){
-        setStatusMessage("4")
-      }
-      if(remaining <= 3){
-        setStatusMessage("3")
-      }
-      if(remaining <= 2){
-        setStatusMessage("2")
-      }
-      if(remaining <= 1){
-        setStatusMessage("1")
-      }
-    }, [progress, active, duration, ogTime, setStatusMessage]);
+  const remaining = progress * (duration / 1000);
+  const warnedHalf = useRef(false);
+
+  useEffect(() => {
+    if (active) {
+      warnedHalf.current = false;
+    }
+  }, [active, duration]); // watches for these states to change and then flags as half the time is remaining
+
+  useEffect(() => {
+    if (!active) return; //if the timer isn't active get outta here
+
+    const remaining = progress * (duration / 1000); // calculates time left
+
+    if (!warnedHalf.current && remaining <= ogTime * 0.5) {// displays status message when hallf the time is gone.
+      warnedHalf.current = true;
+      setStatusMessage("You have used half your allotted time!!!");
+    }
+
+    if(remaining <= 5){
+      setStatusMessage("5")
+    }
+    if(remaining <= 4){
+      setStatusMessage("4")
+    }
+    if(remaining <= 3){
+      setStatusMessage("3")
+    }
+    if(remaining <= 2){
+      setStatusMessage("2")
+    }
+    if(remaining <= 1){
+      setStatusMessage("1")
+    }
+  }, [progress, active, duration, ogTime, setStatusMessage]); // uses these states 
 
 
 
@@ -80,7 +80,7 @@ export default function BoardTimerBorder({ size, duration, active, ogTime, setSt
 
   let opacity = 1;
 
-  if (remaining <= 5) {
+  if (remaining <= 5) {// blinks with 5 seconds left
     color = "#ef4444";
     const now = performance.now();
     opacity = 0.5 + 0.5 * Math.sin(now / 100);
@@ -98,7 +98,7 @@ export default function BoardTimerBorder({ size, duration, active, ogTime, setSt
         pointerEvents: "none"
       }}
     >
-      <rect
+      <rect // centering the rect inside the svg border
         x={strokeWidth / 2}
         y={strokeWidth / 2}
         width={size - strokeWidth}
