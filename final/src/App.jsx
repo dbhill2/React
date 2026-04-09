@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Board from "./boardControls/Board.jsx";
 import Timer from "./boardControls/Timer.jsx";
 import checkPuzzle from "./utils/checkPuzzle.js";
+import BoardTimerBorder from "./boardControls/BoardTimerBorder.jsx";
 import "./App.css";
 
 
@@ -14,16 +15,20 @@ const URL12x12 = "https://prog2700.onrender.com/threeinarow/12x12";
 const URL14x14 = "https://prog2700.onrender.com/threeinarow/14x14";
 
 export default function App(){
+    //State hooks for timers, board set up, and messages
+    const [ogTime, setOGTime] = useState(20);
     const [board, setBoard] = useState([]);
     const [showIncorrect, setShowIncorrect] = useState(false);
     const [timedMode, setTimedMode] = useState(false);
 
-    const [timeLeft, setTimeLeft] = useState(60);
+    const [timeLeft, setTimeLeft] = useState(ogTime);
     const [timerActive, setTimerActive] = useState(false);
     const [bestTime, setBestTime] = useState(null);
 
-    const [statusMessage, setStatusMessage] = useState("Status: --");
+    const [ogMess, setOGMess] = useState("Status: --")
+    const [statusMessage, setStatusMessage] = useState(ogMess);
 
+    //get our data
     useEffect(() => {
         async function load() {
             const res = await fetch(URLsample);
@@ -41,7 +46,7 @@ export default function App(){
         load();
     }, []);
 
-
+    //countdown effect moves down by 1000ms only active when timed mode is on
     useEffect(() => {
         if (!timerActive) return;
 
@@ -58,14 +63,31 @@ export default function App(){
         }, 1000);
 
         return () => clearInterval(id);
-    }, [timerActive]);
+    }, [timerActive]); //checks timerActives state, when it changes the useEffect fires
 
+    //helper to set everything back to default
+    function resetTimer() {
+        setTimerActive(false);
+        setTimeLeft(ogTime);
+        setOGTime(ogTime)
+        setTimedMode(false)
+    }
+
+    //helper to reset message back to default
+    function resetStatus(){
+        setShowIncorrect(false);
+        setStatusMessage(ogMess);
+    }
+
+    //logic for cell clicks
     function handleCellClick(r, c) {
+        //Activates the timed mode if conditions are met
         if (timedMode && !timerActive) {
             setTimerActive(true);
-            setTimeLeft(60);
+            setTimeLeft(ogTime);
         }
 
+        //copies and saves original board and returns the new version of it
         setBoard(prev => {
             const newBoard = JSON.parse(JSON.stringify(prev));
             const cell = newBoard[r][c];
@@ -74,17 +96,18 @@ export default function App(){
                 return prev;
             }
 
-            cell.currentState = (cell.currentState + 1) % 3;
+            cell.currentState = (cell.currentState + 1) % 3; //moves through the different colours
             return newBoard;
         });
     }
 
+    //moves through the puzzle with checkPuzzle.js and if conditions are bet a best time is displayed
     function handleCheckPuzzle() {
         const message = checkPuzzle(board);
         setStatusMessage(message);
 
         if(message === "You did it!" && timedMode) {
-            const elapsed = 60 - timeLeft;
+            const elapsed = ogTime - timeLeft;
 
             if (bestTime === null || elapsed < bestTime) {
                 setBestTime(elapsed);
@@ -95,6 +118,7 @@ export default function App(){
         }
     }
 
+    //resets the board onclick of the reset button to the original state
     function handleReset() {
         setBoard(prev =>
             prev.map(row => 
@@ -104,17 +128,14 @@ export default function App(){
                 }))
             )
         );
-
-        setShowIncorrect(false);
-        setTimerActive(false);
-        setTimeLeft(60);
-        setStatusMessage("Status: --");
-        setTimedMode(false);
+        resetStatus();
+        resetTimer();
     }
 
+    //styling of the web app
     return (
         <div id="app" style={{ padding: "20px" }}>
-            <h1>Three In A Row</h1>
+            <h1 className="saira-stencil-main">Three In A Row</h1>
 
             {/* Toggles */}
             <label>
@@ -129,12 +150,32 @@ export default function App(){
             {/* Timer */}
             <Timer timeLeft={timeLeft} timerActive={timerActive} bestTime={bestTime}/>
 
-            {/* Board */}
-            <Board
-                board={board}
-                onCellClick={handleCellClick}
-                showIncorrect={showIncorrect}
-            />
+            <div
+                style={{
+                    position: "relative",
+                    width: 300,
+                    height: 300,
+                    marginTop: "20px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center"
+                }}>
+                <BoardTimerBorder 
+                    size={300} 
+                    duration={ogTime * 1000} 
+                    active={timedMode && timerActive}
+                    ogTime={ogTime}
+                    setStatusMessage={setStatusMessage}
+                    />
+                <div className="board-wrapper">
+                    <Board
+                        board={board}
+                        onCellClick={handleCellClick}
+                        showIncorrect={showIncorrect}
+                    />
+                </div>
+            </div>
+
 
             {/* Buttons */}
             <div style={{ marginTop: "20px"}}>
@@ -147,17 +188,18 @@ export default function App(){
             </div>
 
             {/* Status */}
-            <div
+            <div className="status"
                 style={{
                     marginTop: "20px",
                     padding: "10px",
                     border: "1px solid #ccc",
                     width: "250px",
-                    fontWeight: "bold"
+                    fontWeight: "bold",
                 }}
             >
                 {statusMessage}
             </div>
+            
         </div>
     )
 }

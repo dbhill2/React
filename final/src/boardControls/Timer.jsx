@@ -1,5 +1,5 @@
 export default function Timer({ timeLeft, timerActive, bestTime }) {
-    return (
+    return ( //stylings for the timer
         <div style={{ marginTop: "10px" }}>
             <div>Time left: {timerActive ? timeLeft : "--"}</div>
             <div>Best Time: {bestTime ?? "--"}</div>
