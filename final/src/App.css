@@ -1,10 +1,10 @@
 #app {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* keep content at top */
-  align-items: center;         /* center horizontally */
-  min-height: 100vh;           /* full screen height */
-  padding-top: 20px;           /* optional spacing */
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 100vh;
+  padding-top: 20px;
 }
 
 .board-wrapper {
