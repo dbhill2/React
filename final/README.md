@@ -1,78 +1,48 @@
-# App Purpose
+Three In A Row
 
-This app was made for practicing in a React framework.
+A React implementation of the "Three In A Row" puzzle. Fill each square with one of three colors so the board matches the hidden solution, then check your answer against the key — all under an optional countdown timer.
 
-The game that it is based off of can be found here https://www.brainbashers.com/show3inarow.asp
+This project was built as a practice exercise in React (hooks, component composition, and mixing .jsx with typed .tsx files).
 
-Please click the link in order to understand the game.
+How it works
+On load, the app fetches a puzzle (board layout + correct answers) from a remote API and renders it as a grid of clickable squares.
+Clicking a square cycles it through three states/colors. Squares marked as fixed by the puzzle (canToggle: false) can't be changed.
+Check Puzzle compares your current board against the puzzle's answer key and reports whether you're done, still going, or have made a mistake.
+Show/Hide Incorrect toggles red outlines on any square you've colored incorrectly.
+Reset Puzzle restores the board to its original (unsolved) state.
+Timed Mode starts a countdown on your first move, shows a shrinking/color-shifting border around the board as time runs low, and records your best completion time.
+Tech stack
+React (function components + hooks: useState, useEffect, useRef)
+TypeScript for the board's data types and the Square component (.tsx), plain JS/JSX elsewhere
+Create React App for the build tooling
+Puzzle data served from an external API (https://prog2700.onrender.com/threeinarow/...)
+Project structure
+src/
+├── App.jsx                       # Top-level state, puzzle fetching, and layout
+├── App.css                       # App styling
+├── Types/
+│   ├── Cell.tsx                  # Cell type: currentState, correctState, canToggle
+│   └── Square.tsx                # Renders a single clickable board square
+├── boardControls/
+│   ├── Board.jsx                 # Renders the grid of Square components
+│   ├── BoardTimerBorder.jsx      # Animated countdown border drawn around the board
+│   └── Timer.jsx                 # Time-left / best-time display
+└── utils/
+    └── checkPuzzle.js            # Compares board state against the answer key
+Getting started
+Prerequisites
+Node.js and npm installed
+Install & run
+bash
+npm install
+npm start
 
-# Getting Started with Create React App
+This runs the app in development mode. Open http://localhost:3000 to play. The page reloads automatically as you edit the source.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Other scripts
+npm test — launches the test runner in watch mode
+npm run build — builds an optimized production bundle to the build/ folder
+npm run eject — copies the CRA build configuration into the project (one-way operation)
+Notes
+The app currently always loads the sample puzzle endpoint on startup; the other size-specific URLs defined in App.jsx (6x6, 8x8, 10x10, 12x12, 14x14, random) are wired up as constants but not yet hooked to any UI control.
+Play the original puzzle this is modeled after at brainbashers.com to get a feel for the rules before diving into the code.
